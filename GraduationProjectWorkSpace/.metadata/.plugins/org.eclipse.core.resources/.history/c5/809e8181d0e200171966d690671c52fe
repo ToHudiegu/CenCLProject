@@ -1,0 +1,9 @@
+package com.cencl.rest.controller;
+
+import org.springframework.stereotype.Controller;
+
+//接收商品id，调用servie查询商品信息，返回商品对象，使用CenclResult包装
+@Controller
+public class ItemContoller {
+	
+}

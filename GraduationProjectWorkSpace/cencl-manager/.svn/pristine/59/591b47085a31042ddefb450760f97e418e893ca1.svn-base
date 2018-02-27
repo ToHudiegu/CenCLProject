@@ -1,0 +1,17 @@
+package com.cencl.service;
+
+import java.util.List;
+
+import com.cencl.common.pojo.EUTreeNode;
+import com.cencl.common.utils.CenclResult;
+
+public interface ContentCategoryService {
+	
+	 List<EUTreeNode> getCategoryList(long parentId);
+	 
+	 //新增内容分类节点
+	 CenclResult insertContentCategory(Long parentId,String name);
+	 
+	 CenclResult deleteCategory(Long id);
+
+}

@@ -1,0 +1,46 @@
+package com.cencl.portal.interceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+/* *
+* <p>Title: </p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月22日上午10:15:52
+* version 0.0.1
+*/
+public class LoginInterceptor implements HandlerInterceptor{
+
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+		//判断用户登录状态(返回值true or false决定Handler是否执行)
+		//从cookie中取token，根据token读取用户信息(调用接口服务)
+		
+		
+		
+		
+		return false;
+	}
+
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+		
+		
+	}
+
+	@Override
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+			throws Exception {
+		//返回ModelAndView之后
+		
+		
+	}
+
+}

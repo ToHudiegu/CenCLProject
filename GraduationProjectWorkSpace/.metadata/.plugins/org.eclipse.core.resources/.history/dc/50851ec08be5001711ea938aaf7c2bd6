@@ -1,0 +1,82 @@
+package com.cencl.sso.controller;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.common.utils.ExceptionUtil;
+import com.cencl.sso.service.UserService;
+
+/* *
+* <p>Title: 用户controller</p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月20日上午11:28:34
+* version 0.0.1
+*/
+//从Url接收两个参数，在调用service先进行数据校验（type需要为1 || 2 || 3）
+@Controller
+@RequestMapping("/user")
+public class UserController {
+	@Autowired
+	private UserService userService;
+	
+	@RequestMapping("/check/{param}/{type}")
+	@ResponseBody
+	public Object checkUser(@PathVariable String content,@PathVariable Integer type, String callback){
+		CenclResult result = null;
+		
+		//参数有效性校验
+		if(StringUtils.isBlank(content)){
+			//返回错误结果
+			result = CenclResult.build(400, "该参数不能为空");
+		}
+		if(type == null){
+			//返回错误结果
+			result = CenclResult.build(400, "该参数不能为空");
+		}
+		if(type != 1 && type != 2 && type != 3){
+			//返回错误结果
+			result = CenclResult.build(400, "参数非法");
+		}
+		
+		//校验出错
+		if(null != result){
+			//如果字符串不为空，需要支持jsonp调用 spring4.1 以上可用
+			if(null != callback){
+				MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+				mappingJacksonValue.setJsonpFunction(callback);
+				
+				return mappingJacksonValue;
+			}else{
+				return result;
+			}
+			
+		}
+		//调用service方法
+		try {
+			result = userService.checkData(content, type);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			CenclResult.build(500, ExceptionUtil.getStackTrace(e));
+		}
+		
+		if(callback != null){
+			MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+			mappingJacksonValue.setJsonpFunction(callback);
+			
+			return mappingJacksonValue;
+		}else{
+			return result;
+		}
+		
+	}
+}

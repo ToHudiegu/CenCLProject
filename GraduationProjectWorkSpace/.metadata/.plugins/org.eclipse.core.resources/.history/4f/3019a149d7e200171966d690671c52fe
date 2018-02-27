@@ -1,0 +1,36 @@
+package com.cencl.rest.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.rest.service.ItemService;
+
+//接收商品id，调用servie查询商品信息，返回商品对象，使用CenclResult包装
+@Controller
+@RequestMapping("/item")
+public class ItemContoller {
+	@Autowired
+	private ItemService itemService;
+	
+	@RequestMapping("/info/{itemId}")
+	@ResponseBody
+	public CenclResult getItemBaseInfo(@PathVariable Long itemId){
+		CenclResult result = itemService.getItemBaseInfo(itemId);
+		
+		return result;
+	}
+	
+	@RequestMapping("/desc/{itemId}")
+	@ResponseBody
+	public CenclResult getItemDesc(@PathVariable Long itemId){
+		CenclResult itemDesc = itemService.getItemDesc(itemId);
+		
+		return CenclResult.ok(itemDesc);
+		
+	}
+	
+}

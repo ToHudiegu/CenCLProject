@@ -1,0 +1,141 @@
+package com.cencl.rest.service.impl;
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.common.utils.JsonUtils;
+import com.cencl.mapper.TbItemDescMapper;
+import com.cencl.mapper.TbItemMapper;
+import com.cencl.mapper.TbItemParamItemMapper;
+import com.cencl.pojo.TbItem;
+import com.cencl.pojo.TbItemDesc;
+import com.cencl.pojo.TbItemParamItem;
+import com.cencl.pojo.TbItemParamItemExample;
+import com.cencl.pojo.TbItemParamItemExample.Criteria;
+import com.cencl.rest.dao.JedisClient;
+import com.cencl.rest.service.ItemService;
+
+//接收商品id，根据商品id查询商品基本信息，返回一个商品的pojo，使用CenclResult包装返回
+@Service
+public class ItemServiceImpl implements ItemService{
+	@Value("${REDIS_ITEM_KEY}")
+	private String REDIS_ITEM_KEY;
+	@Value("${REDIS_ITEM_EXPIRE}")
+	private Integer REDIS_ITEM_EXPIRE;
+	
+	@Autowired
+	private JedisClient jedisClient;
+	
+	@Autowired
+	private TbItemParamItemMapper itemParamItemMapper;
+	
+	@Autowired
+	private TbItemDescMapper tbItemDescMapper;
+	
+	@Autowired
+	private TbItemMapper itemMapper;
+	
+	@Override
+	public CenclResult getItemBaseInfo(long itemId) {
+		//添加缓存逻辑
+		try {
+			//从缓存中取商品信息(商品id对应的信息)
+			String json = jedisClient.get(REDIS_ITEM_KEY + ":" + itemId + ":base");
+			
+			//判断json是否有值
+			if(StringUtils.isBlank(json)){
+				//将字符串json转换成pojo
+				TbItem tbItem = JsonUtils.jsonToPojo(json, TbItem.class);
+				
+				return CenclResult.ok(tbItem);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		//根据商品id查询商品(json为空则执行下列操作)
+		TbItem item = itemMapper.selectByPrimaryKey(itemId);
+		try {
+			//把商品信息写入缓存
+			jedisClient.set(REDIS_ITEM_KEY + ":" + itemId + ":base", JsonUtils.objectToJson(item));
+			
+			//设置key有效期
+			jedisClient.expire(REDIS_ITEM_KEY + ":" + itemId + ":base", REDIS_ITEM_EXPIRE);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		//使用CenclResult包装
+		return CenclResult.ok(item);
+	}
+	
+	//接收商品id根据商品id查询商品描述。返回商品描述的pojo。使用TaotaoResult包装。需要添加缓存逻辑。
+	@Override
+	public CenclResult getItemDesc(long itemId) {
+		//添加缓存逻辑
+		try{
+			//从缓存中取商品信息(商品id对应的信息)
+			String json = jedisClient.get(REDIS_ITEM_KEY + ":" + itemId + ":base");
+			
+			//判断json是否有值
+			if(StringUtils.isBlank(json)){
+				//将字符串json转换成pojo
+				TbItemDesc tbItemDesc = JsonUtils.jsonToPojo(json, TbItemDesc.class);
+				
+				return CenclResult.ok(tbItemDesc);
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		//根据主键查询
+		TbItemDesc itemDesc = tbItemDescMapper.selectByPrimaryKey(itemId);
+		
+		try {
+			//把商品信息写入缓存
+			jedisClient.set(REDIS_ITEM_KEY + ":" + itemId + ":desc", JsonUtils.objectToJson(itemDesc));
+			
+			//设置key有效期
+			jedisClient.expire(REDIS_ITEM_KEY + ":" + itemId + ":desc", REDIS_ITEM_EXPIRE);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return CenclResult.ok(itemDesc);
+	}
+
+	//接收商品id，取出商品的规格参数信息，返回pojo使用CenclResult包装
+	@Override
+	public CenclResult getItemParam(long itemId) {
+		//设置查询条件
+		TbItemParamItemExample example = new TbItemParamItemExample();
+		Criteria createCriteria = example.createCriteria();
+		createCriteria.andItemIdEqualTo(itemId);
+		
+		//执行查询
+		//根据商品Id查询规格参数
+		List<TbItemParamItem> list = itemParamItemMapper.selectByExampleWithBLOBs(example);
+		
+		//判断是否有值
+		if(list != null && list.size()>0){
+			TbItemParamItem item = list.get(0);
+			
+			return CenclResult.ok(item);
+		}
+		
+		return CenclResult.build(400, "没有查询到您想找的商品信息");
+	}
+	
+	
+	
+
+}

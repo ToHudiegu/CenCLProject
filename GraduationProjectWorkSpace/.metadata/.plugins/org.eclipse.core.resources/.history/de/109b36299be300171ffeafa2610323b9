@@ -1,0 +1,7 @@
+#fu wu ceng shu xing ding yi
+REST_BASE_URL=http://localhost:8060/rest/
+#shou ye da guang gao wei
+REST_INDEX_AD_URL=/content/list/89
+
+#sou suo fu wu ji chu url
+SEARCH_BASE_URL=http://localhost:8040/search/query

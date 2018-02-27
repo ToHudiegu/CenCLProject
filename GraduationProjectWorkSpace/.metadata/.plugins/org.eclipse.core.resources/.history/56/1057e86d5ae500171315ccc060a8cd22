@@ -1,0 +1,13 @@
+package com.cencl.sso.service;
+
+/* *
+* <p>Title: </p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月20日下午3:49:47
+* version 0.0.1
+*/
+public class RegisterUser {
+
+}

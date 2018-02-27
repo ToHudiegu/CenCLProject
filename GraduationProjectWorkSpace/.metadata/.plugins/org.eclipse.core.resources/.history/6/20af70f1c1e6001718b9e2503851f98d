@@ -1,0 +1,65 @@
+package com.cencl.portal.interceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cencl.common.utils.CookieUtils;
+import com.cencl.pojo.TbUser;
+import com.cencl.portal.service.UserService;
+import com.cencl.portal.service.impl.UserServiceImpl;
+
+/* *
+* <p>Title: </p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月22日上午10:15:52
+* version 0.0.1
+*/
+public class LoginInterceptor implements HandlerInterceptor {
+
+	@Autowired
+	private UserServiceImpl userService;
+
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+		// 判断用户登录状态(返回值true or false决定Handler是否执行)
+		String token = CookieUtils.getCookieValue(request, "TT_TOKEN");
+
+		// 从cookie中取token，根据token读取用户信息(调用接口服务)
+		TbUser user = userService.getUserByToken(token);
+
+		// 判断用户信息是否为空(空则为没登录)
+		if (null == user) {
+			response.sendRedirect(
+					userService.SSO_BASE_URL + userService.SSO_PAGE_LOGIN + "?redirect=" + request.getRequestURL());
+			//返回false
+			return false;
+			
+		}
+
+		// 取不到用户信息则跳转登录页面(把用户请求页面的url传递给登录页面，实现登录成功后跳转登录前的页面)
+		// 用户信息不为空，则放行（已经登录）
+
+		return true;
+	}
+
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+
+	}
+
+	@Override
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+			throws Exception {
+		// 返回ModelAndView之后
+
+	}
+
+}

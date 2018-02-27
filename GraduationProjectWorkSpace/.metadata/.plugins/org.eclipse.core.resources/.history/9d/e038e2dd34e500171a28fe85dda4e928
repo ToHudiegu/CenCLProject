@@ -1,0 +1,15 @@
+package com.cencl.sso.service;
+
+import com.cencl.common.utils.CenclResult;
+
+/* *
+* <p>Title: </p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月20日上午11:18:20
+* version 0.0.1
+*/
+public interface UserService {
+	CenclResult checkData(String content, String type);
+}

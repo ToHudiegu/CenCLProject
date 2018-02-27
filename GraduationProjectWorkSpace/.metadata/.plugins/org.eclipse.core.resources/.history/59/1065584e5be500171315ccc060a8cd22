@@ -1,0 +1,40 @@
+package com.cencl.sso.service.impl;
+
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.mapper.TbUserMapper;
+import com.cencl.pojo.TbUser;
+import com.cencl.sso.service.RegisterUser;
+
+/* *
+* <p>Title: </p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月20日下午3:50:45
+* version 0.0.1
+*/
+@Service
+public class RegisterUserImpl implements RegisterUser{
+	@Autowired
+	private TbUserMapper userMapper;
+	
+	@Override
+	public CenclResult createUser(TbUser user) {
+		//补全pojo
+		user.setCreated(new Date());
+		user.setUpdated(new Date());
+		
+		//密码使用MD5加密
+		user.setPassword(user.getPassword());
+		
+		
+		
+		return null;
+	}
+
+}

@@ -1,0 +1,16 @@
+package com.cencl.sso.service;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.pojo.TbUser;
+
+/* *
+* <p>Title: 用户注册</p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月20日下午3:49:47
+* version 0.0.1
+*/
+public class RegisterUser {
+	CenclResult createUser(TbUser user);
+}

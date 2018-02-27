@@ -1,0 +1,13 @@
+package com.cencl.sso.controller;
+
+/* *
+* <p>Title: </p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月21日上午11:02:50
+* version 0.0.1
+*/
+public class PageController {
+
+}

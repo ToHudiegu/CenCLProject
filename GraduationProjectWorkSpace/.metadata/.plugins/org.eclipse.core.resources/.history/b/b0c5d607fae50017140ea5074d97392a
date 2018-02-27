@@ -1,0 +1,135 @@
+package com.cencl.sso.controller;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.common.utils.ExceptionUtil;
+import com.cencl.pojo.TbUser;
+import com.cencl.sso.service.UserService;
+
+/* *
+* <p>Title: 用户controller</p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月20日上午11:28:34
+* version 0.0.1
+*/
+//从Url接收两个参数，在调用service先进行数据校验（type需要为1 || 2 || 3）
+@Controller
+@RequestMapping("/user")
+public class UserController {
+
+	@Autowired
+	private UserService userService;
+	
+	@RequestMapping("/check/{param}/{type}")
+	@ResponseBody
+	public Object checkData(@PathVariable String param, @PathVariable Integer type, String callback) {
+		
+		CenclResult result = null;
+		
+		//参数有效性校验
+		if (StringUtils.isBlank(param)) {
+			result = CenclResult.build(400, "校验内容不能为空");
+		}
+		if (type == null) {
+			result = CenclResult.build(400, "校验内容类型不能为空");
+		}
+		if (type != 1 && type != 2 && type != 3 ) {
+			result = CenclResult.build(400, "校验内容类型错误");
+		}
+		//校验出错
+		if (null != result) {
+			if (null != callback) {
+				MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+				mappingJacksonValue.setJsonpFunction(callback);
+				return mappingJacksonValue;
+			} else {
+				return result; 
+			}
+		}
+		//调用服务
+		try {
+			result = userService.checkData(param, type);
+			
+		} catch (Exception e) {
+			result = CenclResult.build(500, ExceptionUtil.getStackTrace(e));
+		}
+		
+		//预留，需要JsonP时可以调用
+		if (null != callback) {
+			MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+			mappingJacksonValue.setJsonpFunction(callback);
+			return mappingJacksonValue;
+		} else {
+			return result; 
+		}
+	}
+	
+	
+	
+	@RequestMapping(value="/register", method=RequestMethod.POST)
+	@ResponseBody
+	//使用pojo（TbUser）接收字段，调用service向TbUser添加记录
+	public CenclResult createUser(TbUser tbUser){
+		try {
+			CenclResult result = userService.createUser(tbUser);
+			
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return CenclResult.build(500, ExceptionUtil.getStackTrace(e));
+		}
+	}
+
+	
+	//用户登录接口
+	@RequestMapping(value="/login", method=RequestMethod.POST)
+	@ResponseBody
+	public CenclResult userLogin(String username, String password) {
+		try {
+			CenclResult result = userService.userLogin(username, password);
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return CenclResult.build(500, ExceptionUtil.getStackTrace(e));
+		}
+	}
+	
+	
+	//接收用户token
+	@RequestMapping("/token/{token}")
+	@ResponseBody
+	public CenclResult getToken(@PathVariable String token, String callback){
+		CenclResult result = null;
+		
+		try {
+			result = userService.getToken(token);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = CenclResult.build(500, ExceptionUtil.getStackTrace(e));
+		}
+		
+		//判断是否jsonp调用
+		if(StringUtils.isBlank(callback)){
+			return  result;
+			
+		}
+		
+		
+		
+	}
+	
+	
+
+}
+

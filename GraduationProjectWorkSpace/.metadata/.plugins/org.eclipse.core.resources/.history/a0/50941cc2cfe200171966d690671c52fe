@@ -1,0 +1,5 @@
+package com.cencl.rest.service;
+
+public interface ItemService {
+
+}

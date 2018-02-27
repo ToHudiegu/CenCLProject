@@ -1,0 +1,17 @@
+package com.cencl.portal.service;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.pojo.TbItem;
+
+/* *
+* <p>Title: </p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月19日上午10:00:11
+* version 0.0.1
+*/
+public interface ItemService {
+	Item getItemById(Long itemId);
+	
+}

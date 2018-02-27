@@ -1,0 +1,52 @@
+package com.cencl.rest.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.common.utils.ExceptionUtil;
+import com.cencl.pojo.TbContent;
+import com.cencl.rest.service.ContentService;
+
+//RESTFUL风格，分类id从url中获得
+//发布服务，接收查询参数，调用service，查询内容列表，返回该list(JSON格式)
+@Controller
+@RequestMapping("/content")
+public class ContentController {
+	@Autowired
+	private ContentService contentService;
+	
+	//服务可能出现正忙等情况，使用CenclResult封装状态
+	@RequestMapping("/list/{contentCategoryId}")
+	@ResponseBody
+	public CenclResult getContentList(@PathVariable Long contentCategoryId) {
+		try {
+			List<TbContent> list = contentService.getContentList(contentCategoryId);
+			return CenclResult.ok(list);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return CenclResult.build(500, ExceptionUtil.getStackTrace(e));
+		}
+	}
+	
+	@RequestMapping("/sync/content/{cid}")
+	@ResponseBody
+	public CenclResult sysncContent(@PathVariable Long cid){
+		try{
+		 	CenclResult result =  contentService.syncContent(cid);
+			
+			return result;
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			return CenclResult.build(500, ExceptionUtil.getStackTrace(e));
+		}
+		
+	}
+	
+}

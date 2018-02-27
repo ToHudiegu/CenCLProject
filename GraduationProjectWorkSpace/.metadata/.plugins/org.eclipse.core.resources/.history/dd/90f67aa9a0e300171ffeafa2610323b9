@@ -1,0 +1,8 @@
+package com.cencl.rest.service;
+
+import com.cencl.common.pojo.CenclResult;
+
+public interface RedisService {
+
+	CenclResult syncContent(long contentCid);
+}

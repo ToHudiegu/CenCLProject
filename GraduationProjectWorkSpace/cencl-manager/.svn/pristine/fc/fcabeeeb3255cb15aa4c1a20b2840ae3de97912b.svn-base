@@ -1,0 +1,140 @@
+package com.cencl.service.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cencl.common.pojo.EUTreeNode;
+import com.cencl.common.utils.CenclResult;
+import com.cencl.mapper.TbContentCategoryMapper;
+import com.cencl.pojo.TbContentCategory;
+import com.cencl.pojo.TbContentCategoryExample;
+import com.cencl.pojo.TbContentCategoryExample.Criteria;
+import com.cencl.service.ContentCategoryService;
+
+@Service
+public class ContentCategoryServiceImpl implements ContentCategoryService {
+
+	@Autowired
+	private TbContentCategoryMapper contentCategoryMapper;
+
+	@Override
+	public List<EUTreeNode> getCategoryList(long parentId) {
+		// 根据parentid查询节点列表
+		TbContentCategoryExample example = new TbContentCategoryExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andParentIdEqualTo(parentId);
+		// 执行查询
+		List<TbContentCategory> list = contentCategoryMapper.selectByExample(example);
+		List<EUTreeNode> resultList = new ArrayList<>();
+		for (TbContentCategory tbContentCategory : list) {
+			// 创建一个节点
+			EUTreeNode node = new EUTreeNode();
+			node.setId(tbContentCategory.getId());
+			node.setText(tbContentCategory.getName());
+			node.setState(tbContentCategory.getIsParent() ? "closed" : "open");
+
+			resultList.add(node);
+		}
+		return resultList;
+	}
+	/*
+	 * 接收两个参数parentId父节点id、name：当前节点的名称。
+	 * 向tb_content_category表中添加一条记录。返回TaoTaoResult包含记录的pojo对象。
+	 */
+	@Override
+	public CenclResult insertContentCategory(Long parentId, String name) {
+		//先创建一个pojo
+		TbContentCategory tbContentCategory = new TbContentCategory();
+		//在当前事务中取最后一个生成的id   LAST_INSERT_ID()
+		tbContentCategory.setCreated(new Date());
+		tbContentCategory.setUpdated(new Date());
+		//新增节点为false，父节点要随之更新（如果插入前为叶子结点，新增后则为父节点）
+		tbContentCategory.setIsParent(false);
+		//1为正常，2为删除
+		tbContentCategory.setStatus(1);
+		tbContentCategory.setParentId(parentId);
+		tbContentCategory.setSortOrder(1);
+		tbContentCategory.setName(name);
+		
+		//把记录添加到数据库中
+		contentCategoryMapper.insert(tbContentCategory);
+
+		//查看父节点的isparent是否为true，如果不是则修改为true
+		TbContentCategory parentCat = contentCategoryMapper.selectByPrimaryKey(parentId);
+		//判断是否为true
+		if(parentCat.getIsParent()){
+			parentCat.setIsParent(true);
+			//更新父节点
+			contentCategoryMapper.updateByPrimaryKey(parentCat);
+			
+		}
+		//返回结果
+		return CenclResult.ok(tbContentCategory);
+		
+	}
+	@Override
+	public CenclResult deleteCategory(Long id) {
+		/*
+		 * 删除id对应的记录。判断parentid对应的记录下是否有子节点。
+		 * 如果没有子节点则把parentid对应的记录的isparent改成false。
+		 * */
+		TbContentCategory node = contentCategoryMapper.selectByPrimaryKey(id);
+		//判断是否为父节点
+		if(!node.getIsParent()){
+			deleteCategory(id);
+			TbContentCategoryExample example = new TbContentCategoryExample();
+			//创建查询条件
+			Criteria criteria = example.createCriteria();
+			criteria.andParentIdEqualTo(node.getParentId());
+			
+			List<TbContentCategory> list = contentCategoryMapper.selectByExample(example);
+			
+			if(list != null || list.size() > 0){
+				int j = 0;
+				for(int i=0; i<list.size(); i++){
+					if(list.get(0).getStatus() == 0){
+						j++;
+					}
+				}
+				if (j == 0) {
+					TbContentCategory category = new TbContentCategory();
+					category.setId(node.getParentId());
+					category.setIsParent(false);
+					contentCategoryMapper.updateByPrimaryKey(category);
+					
+				}
+			}else{
+				TbContentCategoryExample example2 = new TbContentCategoryExample();
+				//创建查询条件
+				Criteria criteria2 = example2.createCriteria();
+				criteria.andParentIdEqualTo(id);
+
+				List<TbContentCategory> list2 = contentCategoryMapper.selectByExample(example2);
+				
+				if(list2 != null || list2.size() > 0){
+					for (TbContentCategory tbContentCategory : list2) {
+						deleteCategory(tbContentCategory.getId());
+					}
+					
+				}
+				deleteCategory(id);
+				
+			}
+			
+		}
+		
+		return CenclResult.ok();
+	}
+	
+	private void deletePtCatgory(Long id){
+		TbContentCategory category=new TbContentCategory();
+		category.setId(id);
+		category.setStatus(2);
+		contentCategoryMapper.updateByPrimaryKeySelective(category);
+	}
+
+}

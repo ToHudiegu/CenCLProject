@@ -1,0 +1,46 @@
+package com.cencl.portal.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.cencl.common.utils.HttpClientUtil;
+import com.cencl.pojo.TbUser;
+import com.cencl.portal.service.UserService;
+
+/* *
+* <p>Title: 根据token读取用户信息，返回User对象，没有取得返回null,供拦截器调用</p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月22日上午10:28:26
+* version 0.0.1
+*/
+@Service
+public class UserServiceImpl implements UserService{
+	@Value("${SSO_BASE_URL}")
+	private String SSO_BASE_URL;
+	
+	@Value("${SSO_USER_TOKEN}")
+	private String SSO_USER_TOKEN;
+	
+	@Override
+	public TbUser getUserByToken(String token) {
+		//调用sso取用户信息(包含TBUser对象)
+		String json = HttpClientUtil.doGet(SSO_BASE_URL + SSO_USER_TOKEN + token);
+		
+		//转换成CenclResult
+		
+		
+		
+		
+		
+		
+		return null;
+	}
+	
+	
+	
+	
+	
+}

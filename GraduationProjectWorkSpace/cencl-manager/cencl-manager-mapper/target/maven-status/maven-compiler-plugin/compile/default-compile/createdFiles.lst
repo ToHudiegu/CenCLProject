@@ -1,0 +1,11 @@
+com\cencl\mapper\TbOrderItemMapper.class
+com\cencl\mapper\TbItemMapper.class
+com\cencl\mapper\TbOrderShippingMapper.class
+com\cencl\mapper\TbContentCategoryMapper.class
+com\cencl\mapper\TbItemParamMapper.class
+com\cencl\mapper\TbItemCatMapper.class
+com\cencl\mapper\TbOrderMapper.class
+com\cencl\mapper\TbUserMapper.class
+com\cencl\mapper\TbItemParamItemMapper.class
+com\cencl\mapper\TbItemDescMapper.class
+com\cencl\mapper\TbContentMapper.class

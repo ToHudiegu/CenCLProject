@@ -1,0 +1,55 @@
+package com.cencl.sso.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.mapper.TbUserMapper;
+import com.cencl.pojo.TbUserExample;
+import com.cencl.pojo.TbUserExample.Criteria;
+import com.cencl.sso.service.UserService;
+
+/* *
+* <p>Title: 用户管理Service</p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月20日上午11:19:04
+* version 0.0.1
+*/
+@Service
+public class UserServiceImpl implements UserService{
+	@Autowired
+	private TbUserMapper userMapper;
+	
+	@Override
+	public CenclResult checkData(String content, Integer type) {
+		//创建查询条件
+		TbUserExample example =new TbUserExample();
+		Criteria criteria = example.createCriteria();
+		
+		//对数据类型进行校验(1、2、3分别代表username、phone、email)
+		//用户名校验
+		if(1 == type){
+			//如果有则返回提示不可用
+			criteria.andUsernameEqualTo(content);
+			
+		} else if(2 == type){
+			//如果有则返回提示不可用
+			
+			
+		}else {
+			//如果有则返回提示不可用
+			
+			
+		}
+		
+		
+		
+		
+		
+		
+		return null;
+	}
+
+}

@@ -1,0 +1,14 @@
+package com.cencl.rest.service;
+
+import com.cencl.common.utils.CenclResult;
+
+public interface ItemService {
+	//取商品基本信息
+	CenclResult getItemBaseInfo(long itemId);
+	
+	//取商品描述
+	CenclResult getItemDesc(long itemId);
+	
+	//取商品规格参数
+	
+}

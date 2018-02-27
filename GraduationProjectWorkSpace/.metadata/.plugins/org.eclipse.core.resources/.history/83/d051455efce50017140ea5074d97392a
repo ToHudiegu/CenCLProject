@@ -1,0 +1,28 @@
+package com.cencl.sso.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/* *
+* <p>Title: 用户注册Controller</p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月21日上午11:02:50
+* version 0.0.1
+*/
+@Controller
+@RequestMapping("/page")
+public class PageController {
+	@RequestMapping("/register")
+	public String showRegister(){
+		
+		return "register";
+	}
+	
+	@RequestMapping("/showLogin")
+	public String showLogin(){
+		return "login";
+		
+	}
+}

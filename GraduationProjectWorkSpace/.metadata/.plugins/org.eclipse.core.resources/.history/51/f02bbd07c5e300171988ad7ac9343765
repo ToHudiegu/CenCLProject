@@ -1,0 +1,8 @@
+#首页内容信息在redis中保存的key
+INDEX_CONTENT_REDIS_KEY=INDEX_CONTENT_REDIS_KEY
+
+#shang pin xin xi zai redis bao cun de key
+REDIS_ITEM_KEY=REDIS_ITEM_KEY
+
+#sahng pin xin xi zai redis de guo qi shi jian, default:1 days
+REDIS_ITEM_EXPIRE=86400

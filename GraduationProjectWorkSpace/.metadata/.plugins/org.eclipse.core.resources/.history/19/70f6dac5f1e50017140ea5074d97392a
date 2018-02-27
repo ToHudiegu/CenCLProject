@@ -1,0 +1,68 @@
+package com.cencl.sso.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
+
+import com.cencl.common.utils.CenclResult;
+import com.cencl.mapper.TbUserMapper;
+import com.cencl.pojo.TbUser;
+import com.cencl.pojo.TbUserExample;
+import com.cencl.pojo.TbUserExample.Criteria;
+import com.cencl.sso.service.UserService;
+
+/* *
+* <p>Title: 用户管理Service</p>
+* <p>Description: </p>
+* <p>Company: Nothing</p>
+* @author:  phubing
+* @date: 2017年12月20日上午11:19:04
+* version 0.0.1
+*/
+@Service
+public class UserServiceImpl implements UserService {
+
+	@Autowired
+	private TbUserMapper userMapper;
+	
+	@Override
+	public CenclResult checkData(String content, Integer type) {
+		//创建查询条件
+		TbUserExample example = new TbUserExample();
+		Criteria criteria = example.createCriteria();
+		//对数据进行校验：1、2、3分别代表username、phone、email
+		//用户名校验
+		if (1 == type) {
+			criteria.andUsernameEqualTo(content);
+		//电话校验
+		} else if ( 2 == type) {
+			criteria.andPhoneEqualTo(content);
+		//email校验
+		} else {
+			criteria.andEmailEqualTo(content);
+		}
+		//执行查询
+		List<TbUser> list = userMapper.selectByExample(example);
+		if (list == null || list.size() == 0) {
+			return CenclResult.ok(true);
+		}
+		return CenclResult.ok(false);
+	}
+
+	@Override
+	public CenclResult createUser(TbUser tbUser) {
+		//补全pojo
+		tbUser.setCreated(new Date());
+		tbUser.setUpdated(new Date());
+		
+		tbUser.setPassword(DigestUtils.md5DigestAsHex(tbUser.getPassword().getBytes()));
+		
+		userMapper.insert(tbUser);
+		
+		return CenclResult.ok();
+	}
+
+}
